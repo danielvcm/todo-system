@@ -24,7 +24,7 @@ Action-specific params and expected `data` in the response:
   - response.data: `{ occurrences: [ { occurrence_id, task: { id, title, assignee_id }, date, status } ] }`
 
 - `create_task`:
-  - params: `{ title: string, description?: string, assignee_id?: int, start_due_date?: "YYYY-MM-DD", end_due_date?: "YYYY-MM-DD", recurrence_rule?: object|string }
+  - params: `{ title: string, description?: string, assignee_id?: int, start_due_date?: "YYYY-MM-DD", end_due_date?: "YYYY-MM-DD", recurrence_rule?: object }
   - response.data: `{ task_id: int }`
 
 - `update_task`:
@@ -70,5 +70,13 @@ window.addEventListener('ha-event-todo_response', handle);
 
 Backend contract notes:
 
-- The pyscript handler MUST fire an event named `todo_response` with the raw JSON payload described above. The frontend will receive events via the Home Assistant websocket layer.
+- Canonical recurrence format: `recurrence_rule` MUST be a JSON object in requests and persisted records (MVP canonical form). Example:
+
+```json
+{ "freq": "weekly", "interval": 1, "byweekday": [1], "until": "2026-12-31" }
+```
+
+- The pyscript handler MUST fire an event named `todo_response` with the JSON payload described above. The frontend will receive events via the Home Assistant websocket layer.
 - The pyscript handler MUST never block HA's event loop for long periods. Use short DB transactions, file locks, or offload heavy work to an executor.
+
+- Validation: service handlers MUST validate `recurrence_rule` JSON (shape and allowed values) and return `status: "error"` with a descriptive `error` string when validation fails. Unit tests must cover invalid recurrence payloads.

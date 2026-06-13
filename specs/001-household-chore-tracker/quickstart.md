@@ -16,6 +16,38 @@ This quickstart describes the minimal steps to validate the feature end-to-end i
 
 3. Restart Home Assistant or reload Pyscript.
 
+### Verify DB and Storage Security (required for production)
+
+- After deploying the pyscript modules, confirm the database file exists at the configured path (recommended `/config/todo_system/todo.db`). From the HA host or Docker container, run:
+
+```bash
+ls -l /config/todo_system/todo.db
+```
+
+- Verify file permissions restrict access (recommended `600`):
+
+```bash
+chmod 600 /config/todo_system/todo.db
+ls -l /config/todo_system/todo.db
+```
+
+- Verify underlying storage is encrypted for production systems. Exact steps depend on your HA installation model:
+  - HAOS: Prefer enabling HAOS disk encryption where supported; consult HAOS documentation for enabling/disabling encryption for your device.
+  - VM-based deployments: ensure the VM disk is encrypted at the hypervisor or host level.
+  - Container-based/dev environments: use an encrypted host filesystem or encrypted volume for `/config`.
+
+- Basic host-level checks (may require host/SSH access):
+
+```bash
+# show block devices and mountpoints
+lsblk -o NAME,MOUNTPOINT,TYPE,SIZE
+
+# on some hosts, check for LUKS devices
+sudo cryptsetup status <device-name>
+```
+
+- Add a verification entry to your deployment checklist that confirms encryption is enabled for production. The `specs/001-household-chore-tracker/quickstart.md` should document how to perform this verification for your target production environment.
+
 ## Deploy frontend (React custom panel)
 
 1. Build the React app locally:
@@ -52,6 +84,16 @@ panel_custom:
 1. Open the custom panel in the HA UI.
 2. Ensure Pyscript logs show the module loaded and the database migrations ran (if implemented).
 3. Use the UI to create a recurring task and confirm it appears in "Due Today" when appropriate.
+
+## Quick verification: Recurrence format
+
+- When creating tasks via the UI or direct service calls, the `recurrence_rule` payload MUST be a JSON object in the canonical format (see `data-model.md`). Example service payload for creating a weekly task on Mondays:
+
+```json
+{ "id": "<uuid>", "action": "create_task", "params": { "title": "Take out trash", "recurrence_rule": { "freq": "weekly", "byweekday": [1] } } }
+```
+
+The backend will validate the recurrence JSON and return an error if the shape is invalid.
 
 ## Local development cycle (recommended)
 

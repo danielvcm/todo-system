@@ -76,12 +76,26 @@ As a household member, I want to set a due interval (start and end) so a task ca
 
 - **FR-009**: System MUST support separate user logins with basic household membership and assignment permissions. Rationale: per-user authentication enables clear assignment, completion history per person, and accountability; chosen for MVP to allow distinct profiles for household members.
 
+## Security & Deployment Note
+
+- Production deployments MUST ensure the SQLite database file is stored on encrypted storage (disk-level encryption, encrypted partition, or encrypted container) to meet the project's security requirements for data-at-rest. The implementation must document the required HAOS or host configuration and include a verification checklist in `quickstart.md`.
+
 ### Key Entities *(include if feature involves data)*
 
 - **User**: household member identity; attributes: `id`, `name`, `display_name`, `ha_id` for the home assistant user id.
 - **Task**: represents a chore template; attributes: `id`, `title`, `description`, `assignee_id` (nullable), `start_due_date` (for tasks with due interval, nullable), `end_due_date` (not nullable), `recurrence_rule` (nullable), `active`.
 - **Occurrence**: a computed or persisted occurrence of a `Task` for a specific date; attributes: `task_id`, `date`, `status` (open/completed), `completed_at`.
 - **RecurrenceRule**: structured recurrence specification: type, interval, byDay/byMonth, endDate (nullable).
+
+**Recurrence representation (MVP canonical format)**
+
+- The `recurrence_rule` field MUST use a simple JSON object for MVP to simplify parsing inside Pyscript. Example:
+
+```
+{ "freq": "weekly", "interval": 1, "byweekday": [1], "until": "2026-12-31" }
+```
+
+- RFC-5545 `RRULE` string support MAY be added as an import/export convenience, but the internal canonical format for storage and service contracts is JSON as above. Update the data model and service contracts to reflect this canonical choice.
 
 ## Success Criteria *(mandatory)*
 

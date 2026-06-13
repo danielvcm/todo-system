@@ -43,36 +43,45 @@
 
 ## Phase 5: Users, Assignment & Permissions
 
-- [ ] T021 Implement `list_users` and `create_user` service actions and add `users` table helpers
-- [ ] T022 Ensure service handlers enforce basic HA user checks where appropriate (document expected behavior)
-- [ ] T023 Add tests `tests/unit/test_users.py` for user management
+- [ ] T021 Implement `list_users` action and `users` table helpers that map application users 1:1 to Home Assistant users (use HA `user_id`/username). Seed and synchronize the `users` table from existing HA users on startup; do not treat app users as separate accounts.
+- [ ] T022 Implement `create_user` only as an explicit admin convenience (if required) and document behavior; prefer syncing from HA. Ensure service handlers associate actions with the calling HA user (use HA auth context) and enforce expected permission checks.
+- [ ] T023 Add tests `tests/unit/test_users.py` for user synchronization, assignment lookups, and permission/identity enforcement (simulate HA user context where possible)
 
 ## Phase 6: Frontend (React) - Skeleton to MVP
 
-- [ ] T024 Scaffold `frontend/` React app with Vite + React 18; basic routing and `Due Today` page
-- [ ] T025 Implement `hass` connector in frontend to call `todo_system.request` service and listen for `todo_response` events
-- [ ] T026 Implement `DueToday` component that calls `list_due` on mount and renders occurrences
-- [ ] T027 Implement `CreateTask` form supporting title, description, assignee, due date/interval, recurrence rule
-- [ ] T028 Add frontend unit tests (Vitest) for core components
+- [ ] T024 Initialize frontend project: `frontend/` with Vite + React 18, TypeScript, ESLint, Prettier, and Vitest. Add `package.json` scripts: `dev`, `build`, `test`, `lint`.
+- [ ] T025 Create frontend folder layout: `src/components/`, `src/pages/`, `src/services/`, `src/hooks/`, `src/styles/`, `src/i18n/` and `public/` for static assets.
+- [ ] T026 Implement `frontend/src/services/haConnector.ts`: wrapper to call Home Assistant services with correlation UUID and subscribe to `todo_response` events. Provide `request(action, params): Promise`.
+- [ ] T027 Build `DueToday` page scaffold (`src/pages/DueToday`) with header, date picker, and list placeholder; wire routing so panel loads at `/local/todo-system/index.html` within HA panel.
+- [ ] T028 Implement `OccurrenceRow` component (`src/components/OccurrenceRow`) showing title, assignee badge, due info (date/interval), recurrence indicator, and completion control. Make controls keyboard-focusable and aria-labeled.
+- [ ] T029 Implement `DueList` component that fetches `list_due` via `haConnector.request` and renders `OccurrenceRow` items with loading/empty states and error handling.
+- [ ] T030 Implement `CreateTask` page/form (`src/pages/CreateTask`): title, description, assignee selector (populated from HA), due date OR start/end interval, recurrence presets and advanced editor, client-side validation, and submit via `create_task`.
+- [ ] T031 Implement `TaskDetail` modal/panel for editing a task (reuses CreateTask fields) with `update_task` and `delete_task` actions and confirmation flows.
+- [ ] T032 Styling & theme integration: create `src/styles/ha-theme.css` that references Home Assistant CSS variables and design tokens (e.g., `--ha-card-background`, `--mdc-theme-primary`). Ensure components use HA spacing, typography, and card-like containers.
+- [ ] T033 Accessibility & i18n: add keyboard navigation, ARIA attributes, and i18n scaffolding (`src/i18n/`) with English strings; write basic i18n tests.
+- [ ] T034 Tests: add Vitest + React Testing Library tests for `OccurrenceRow`, `DueList`, and `CreateTask`. Add mocks for `haConnector` and snapshot tests.
+- [ ] T035 Storybook (optional): scaffold `frontend/.storybook/` and add component stories for visual testing and design review.
+
 
 ## Phase 7: Integration, E2E & CI
 
-- [ ] T029 Add `tests/e2e/` skeleton for Playwright tests (optional) and at least one E2E scenario for Due Today
-- [ ] T030 Add GitHub Actions workflow `ci.yaml` to run Python unit tests and frontend unit tests on push/PR
-- [ ] T031 Add local integration script `scripts/deploy_to_ha.sh` for dev: build frontend, scp `dist/` to HA `/config/www/todo-system/`, copy `ha/pyscripts/*.py` to `/config/pyscripts/`
+- [ ] T036 Add `tests/e2e/` skeleton for Playwright tests and at least one E2E scenario that verifies the Due Today flow end-to-end inside HA (document HA setup steps for E2E)
+- [ ] T037 Add GitHub Actions workflow `ci.yaml` to run Python unit tests, frontend unit tests, and lint checks on push/PR
+- [ ] T038 Add local integration script `scripts/deploy_to_ha.sh` for dev: build frontend, copy `dist/` to HA `/config/www/todo-system/`, copy `ha/pyscripts/*.py` to `/config/pyscripts/` (provide scp/rsync examples)
+
 
 ## Phase 8: Packaging, Docs & Quickstart
 
-- [ ] T032 Document `panel_custom` config snippet and deployment steps in `specs/001-household-chore-tracker/quickstart.md`
-- [ ] T033 Add `docs/deployment.md` with backup and DB migration guidance (include `schema_version` strategy)
-- [ ] T034 Add `docs/security.md` with HA-specific notes about user roles and restricting access to the panel
+- [ ] T039 Document `panel_custom` config snippet and deployment steps in `specs/001-household-chore-tracker/quickstart.md`
+- [ ] T040 Add `docs/deployment.md` with backup and DB migration guidance (include `schema_version` strategy)
+- [ ] T041 Add `docs/security.md` with HA-specific notes about user roles and restricting access to the panel
 
 ## Phase 9: Polish & Cross-Cutting Concerns
 
-- [ ] T035 [P] Add PRAGMA and WAL tuning notes to `ha/pyscripts/config.py` and `data-model.md`
-- [ ] T036 Add structured logging and error handling across Pyscript modules
-- [ ] T037 Add acceptance test scripts and sample test data under `tests/fixtures/`
-- [ ] T038 Finalize MVP scope and create release checklist in `docs/release.md`
+- [ ] T042 [P] Add PRAGMA and WAL tuning notes to `ha/pyscripts/config.py` and `data-model.md`
+- [ ] T043 Add structured logging and error handling across Pyscript modules
+- [ ] T044 Add acceptance test scripts and sample test data under `tests/fixtures/`
+- [ ] T045 Finalize MVP scope and create release checklist in `docs/release.md`
 
 ---
 
@@ -87,7 +96,7 @@ Parallel opportunities:
 - [P] `recurrence.py`, `todo_db.py`, and `_utils.py` development can be parallelized by different contributors.
 - [P] Frontend scaffolding and backend migration work can proceed concurrently.
 
-Suggested MVP scope: deliver T001–T012, T018, T024–T026, T031, T032 for a working Due Today experience with completion support.
+Suggested MVP scope: deliver T001–T012, T018, T024–T034, T037, T039 for a working Due Today experience with completion support and an HA-styled frontend.
 
-Total tasks: 38 (T001–T038)
+Total tasks: 45 (T001–T045)
 

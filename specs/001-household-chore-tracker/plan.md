@@ -24,6 +24,8 @@
 
 **Storage**: SQLite single-file DB located under the HA config directory (recommended path: `/config/todo_system/todo.db`) using WAL journaling. Schema and indexes documented in `data-model.md`.
 
+**Storage Security**: For production (HAOS) the SQLite file MUST reside on encrypted storage. Acceptable options: HAOS-provided disk encryption, an encrypted partition or filesystem for `/config`, or running Home Assistant inside an encrypted VM/container. The project will include a `quickstart.md` verification step that checks the host configuration for encryption and correct file permissions (`chmod 600` for the DB file).
+
 **Testing**: Unit tests for pure Python logic executed locally with `pytest`. Frontend unit tests (Vitest or Jest) and optional Playwright end-to-end tests. Integration validation performed by deploying the pyscripts and panel to a Home Assistant instance and running the quickstart validation scenarios.
 
 **Target Platform**: Home Assistant OS (HAOS) running on a local machine. The application runs entirely inside Home Assistant: backend logic as Pyscript scripts and frontend as a custom panel (static assets) served by HA.
@@ -33,6 +35,8 @@
 **Performance Goals**: Designed for a small household (1–6 users). UI interactions should be perceived as immediate; target p95 UI response < 200ms for typical operations. DB operations should be batched and kept short (<100ms typical) to avoid blocking HA.
 
 **Constraints**: No additional external servers allowed. All logic must run inside Home Assistant (pyscript). Pyscript must not block HA's main event loop — DB writes should use small transactions, WAL mode, and a brief file-lock or executor offload pattern. Frontend must be pure static assets; data exchange uses HA services + events (no bespoke HTTP server).
+
+**Recurrence format**: The implementation will use a canonical JSON recurrence representation for storage and transport (example in `data-model.md`). RFC-5545 `RRULE` strings may be supported as an import/export convenience, but the canonical internal representation is JSON to simplify parsing in the Pyscript environment.
 
 **Scale/Scope**: MVP for a small household; features and tradeoffs (e.g., SQLite vs a server DB) chosen accordingly.
 

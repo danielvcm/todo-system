@@ -49,7 +49,13 @@ Purpose: persisted occurrences for a given date. For recurring tasks we may gene
 
 ## Recurrence representation
 
-For MVP the `recurrence_rule` field may contain either a simple JSON object documenting type and params (e.g., `{ "freq": "weekly", "byweekday": [1] }`) or a compact RFC-5545 `RRULE` string. Implementation code should provide a small compatibility layer to read and write the chosen format.
+For MVP the `recurrence_rule` field MUST use a simple JSON object as the canonical internal representation to simplify parsing in Pyscript. Example:
+
+```json
+{ "freq": "weekly", "interval": 1, "byweekday": [1], "until": "2026-12-31" }
+```
+
+The implementation SHOULD provide an import/export helper for RFC-5545 `RRULE` strings, but stored values and service payloads must use the JSON form.
 
 ## Example SQL (SQLite)
 
@@ -90,6 +96,25 @@ CREATE TABLE IF NOT EXISTS occurrences (
 );
 
 CREATE INDEX IF NOT EXISTS idx_occurrences_date ON occurrences(date);
+
+-- Migration meta table for schema versioning
+CREATE TABLE IF NOT EXISTS meta (
+  key TEXT PRIMARY KEY,
+  value TEXT
+);
+
+INSERT OR IGNORE INTO meta(key, value) VALUES('schema_version', '1');
+
+-- Storage & security recommendations
+-- The SQLite DB file should be placed under the HA config directory (for example /config/todo_system/todo.db).
+-- For production deployments the DB file MUST reside on encrypted storage (disk-level encryption, encrypted partition, or encrypted container). Ensure file permissions restrict access (e.g., chmod 600) and back up procedures preserve encryption.
+
+-- PRAGMA recommendations for reliability and concurrency
+PRAGMA journal_mode = WAL;
+PRAGMA synchronous = NORMAL;
+
+-- Date handling note
+-- Store calendar dates in `YYYY-MM-DD` format in the household local timezone. For single-date tasks set `start_due_date` and leave `end_due_date` NULL; interval tasks set both `start_due_date` and `end_due_date` (inclusive).
 ```
 
 ## Migration strategy
