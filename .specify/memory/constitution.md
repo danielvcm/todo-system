@@ -24,7 +24,7 @@ Follow-up TODOs: none
 ## Core Principles
 
 ### I. Security & Privacy (NON-NEGOTIABLE)
-All production services MUST default to secure configurations: HTTPS by default, input
+All production services MUST default to secure configurations: input
 validation and output encoding, least-privilege access for data and secrets, and
 protection against OWASP Top 10 classes of vulnerability. The system MUST collect
 only the minimal user data required for features and MUST provide data deletion
@@ -58,14 +58,14 @@ preferred and clearly labeled.
 
 ## Technology Stack & Deployment
 The project targets a standard web architecture: a browser-based frontend and a
-backend HTTP API with persistent storage. Preferred delivery is containerized
-deployments (Docker) and automated CI/CD pipelines. Secrets MUST be stored in a
-secrets manager; environment-specific configuration MUST be managed via
-environment variables or an approved config service. Use managed services where
-they reduce operational overhead and align with cost constraints.
+backend HTTP API with persistent storage. Preferred delivery is automated CI/CD
+pipelines. Secrets MUST be stored in a secrets manager; environment-specific
+configuration MUST be managed via environment variables or an approved config
+service. Use managed services where they reduce operational overhead and align
+with cost constraints.
 
 ## Development Workflow
-- Branching: feature branches for work, PRs for review, `main` (or `master`) is
+- Branching: feature branches for work, PRs for review, `main` is
 	the production-ready branch.
 - Code review: all PRs MUST receive at least one approving review and pass CI
 	before merge. Security-sensitive changes require an additional security review.
