@@ -3,49 +3,49 @@
 
 ## Phase 1: Setup & Project Scaffolding
 
-- [ ] T001 Create repository scaffolding: `frontend/`, `ha/pyscripts/`, `ha/www/todo-system/`, `tests/`, `docs/`
-- [ ] T002 [P] Add developer notes `specs/001-household-chore-tracker/quickstart.md` with HA access, Pyscript, and DB path recommendations
-- [ ] T003 Add `README.md` stub describing development workflow and deploy steps
-- [ ] T004 Create `ha/pyscripts/config.py` with constants: `DB_PATH`, PRAGMA defaults, and minimal config loader
+- [x] T001 Create repository scaffolding: `frontend/`, `ha/pyscripts/`, `ha/www/todo-system/`, `tests/`, `docs/`
+- [x] T002 [P] Add developer notes `specs/001-household-chore-tracker/quickstart.md` with HA access, Pyscript, and DB path recommendations
+- [x] T003 Add `README.md` stub describing development workflow and deploy steps
+- [x] T004 Create `ha/pyscripts/config.py` with constants: `DB_PATH`, PRAGMA defaults, and minimal config loader
 
 ## Phase 2: Backend Foundations (Pyscript)
 
-- [ ] T005 Create `ha/pyscripts/todo_db.py` with DB connection helpers and migration runner (creates `users`, `tasks`, `occurrences`, `meta`)
-- [ ] T006 [P] Create `ha/pyscripts/_utils.py` with `with_db()` context manager, small file-lock helper, and JSON helper for recurrence rules
-- [ ] T007 Create `ha/pyscripts/recurrence.py` with parsing and simple expansion utilities (JSON and/or RRULE minimal support)
-- [ ] T008 Create `ha/pyscripts/todo_services.py` that registers the `todo_system.request` service and dispatches actions; emits `todo_response` events
-- [ ] T009 Implement DB schema migration and `schema_version` meta table in `todo_db.py`
+- [x] T005 Create `ha/pyscripts/todo_db.py` with DB connection helpers and migration runner (creates `users`, `tasks`, `occurrences`, `meta`)
+- [x] T006 [P] Create `ha/pyscripts/_utils.py` with `with_db()` context manager, small file-lock helper, and JSON helper for recurrence rules
+- [x] T007 Create `ha/pyscripts/recurrence.py` with parsing and simple expansion utilities (JSON and/or RRULE minimal support)
+- [x] T008 Create `ha/pyscripts/todo_services.py` that registers the `todo_system.request` service and dispatches actions; emits `todo_response` events
+- [x] T009 Implement DB schema migration and `schema_version` meta table in `todo_db.py`
 
 ## Phase 3: Backend Core Features (stories)
 
 ### US1 - Due Today (P1)
 
-- [ ] T010 [US1] Implement `list_due(date)` service action: returns deduped list of occurrences and tasks applicable for `date`
-- [ ] T011 [US1] Implement occurrence generation logic: check persisted `occurrences`, include tasks with intervals, consult `recurrence.expand(task, date)` for recurring occurrences
-- [ ] T012 [US1] Add unit tests `tests/unit/test_list_due.py` covering single-date, interval, and recurrence cases
+- [x] T010 [US1] Implement `list_due(date)` service action: returns deduped list of occurrences and tasks applicable for `date`
+- [x] T011 [US1] Implement occurrence generation logic: check persisted `occurrences`, include tasks with intervals, consult `recurrence.expand(task, date)` for recurring occurrences
+- [x] T012 [US1] Add unit tests `tests/unit/test_list_due.py` covering single-date, interval, and recurrence cases
 
 ### US2 - Create Recurring Task (P1)
 
-- [ ] T013 [US2] Implement `create_task` action to insert into `tasks` with validation for dates and recurrence_rule
-- [ ] T014 [US2] Implement `update_task` and `delete_task` actions (delete cascades occurrences)
-- [ ] T015 [US2] Add unit tests `tests/unit/test_recurrence.py` validating parsing and example expansions
+ - [x] T013 [US2] Implement `create_task` action to insert into `tasks` with validation for dates and recurrence_rule
+ - [x] T014 [US2] Implement `update_task` and `delete_task` actions (delete cascades occurrences)
+ - [x] T015 [US2] Add unit tests `tests/unit/test_recurrence.py` validating parsing and example expansions
 
 ### US3 - Flexible Due Interval (P2)
 
-- [ ] T016 [US3] Ensure `create_task` supports `start_due_date` and `end_due_date` and that `list_due` includes tasks for all dates in range
-- [ ] T017 [US3] Add unit tests `tests/unit/test_intervals.py` for interval behavior
+ - [x] T016 [US3] Ensure `create_task` supports `start_due_date` and `end_due_date` and that `list_due` includes tasks for all dates in range
+ - [x] T017 [US3] Add unit tests `tests/unit/test_intervals.py` for interval behavior
 
 ## Phase 4: Occurrence Completion & History
 
-- [ ] T018 Implement `complete_occurrence` action: mark occurrence completed (create occurrence if missing), set `completed_at`, return updated occurrence
-- [ ] T019 [P] Add history-query action `get_task_history(task_id, limit, offset)` returning past occurrences
-- [ ] T020 Add unit tests `tests/unit/test_complete_occurrence.py` verifying completion and history
+- [x] T018 Implement `complete_occurrence` action: mark occurrence completed (create occurrence if missing), set `completed_at`, return updated occurrence
+- [x] T019 [P] Add history-query action `get_task_history(task_id, limit, offset)` returning past occurrences
+- [x] T020 Add unit tests `tests/unit/test_complete_occurrence.py` verifying completion and history
 
 ## Phase 5: Users, Assignment & Permissions
 
-- [ ] T021 Implement `list_users` action and `users` table helpers that map application users 1:1 to Home Assistant users (use HA `user_id`/username). Seed and synchronize the `users` table from existing HA users on startup; do not treat app users as separate accounts.
-- [ ] T022 Implement `create_user` only as an explicit admin convenience (if required) and document behavior; prefer syncing from HA. Ensure service handlers associate actions with the calling HA user (use HA auth context) and enforce expected permission checks.
-- [ ] T023 Add tests `tests/unit/test_users.py` for user synchronization, assignment lookups, and permission/identity enforcement (simulate HA user context where possible)
+- [x] T021 Implement `list_users` action and `users` table helpers that map application users 1:1 to Home Assistant users (use HA `user_id`/username). Seed and synchronize the `users` table from existing HA users on startup; do not treat app users as separate accounts.
+- [x] T022 Implement `create_user` only as an explicit admin convenience (if required) and document behavior; prefer syncing from HA. Ensure service handlers associate actions with the calling HA user (use HA auth context) and enforce expected permission checks.
+- [x] T023 Add tests `tests/unit/test_users.py` for user synchronization, assignment lookups, and permission/identity enforcement (simulate HA user context where possible)
 
 ## Phase 6: Frontend (React) - Skeleton to MVP
 

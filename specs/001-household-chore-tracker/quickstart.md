@@ -1,3 +1,9 @@
+## Quickstart (developer notes)
+
+- Home Assistant: copy built frontend to `/config/www/todo-system/` and pyscripts to `/config/pyscripts/` for local testing.
+- Pyscript DB path: default is `ha/data/todo.sqlite`. Override with `TODO_DB_PATH` env var during dev.
+- Recommended PRAGMAs: WAL journal, `synchronous=NORMAL`, `foreign_keys=ON`.
+- For local dev, run `python3 -m ha.pyscripts.todo_db` to apply migrations.
 # quickstart.md
 
 This quickstart describes the minimal steps to validate the feature end-to-end in Home Assistant OS (HAOS). It assumes you have access to the HA UI (HACS installed or installable) and permission to copy files into the HA `config` directory (Samba/SSH add-on or similar).
