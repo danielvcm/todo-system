@@ -10,6 +10,9 @@ from .recurrence import expand
 from ._utils import with_db, safe_json_loads
 from datetime import datetime
 import json
+import logging
+
+logger = logging.getLogger("todo_system")
 
 
 EventEmitter = Callable[[str, dict], Any]
@@ -17,7 +20,11 @@ EventEmitter = Callable[[str, dict], Any]
 
 def initialize(db_path: str | None = None):
     """Initialize backend (run migrations)."""
-    run_migrations(db_path)
+    try:
+        run_migrations(db_path)
+    except Exception as exc:  # pragma: no cover - defensive logging path
+        logger.exception("backend initialization failed", extra={"db_path": db_path})
+        raise RuntimeError(f"backend initialization failed: {exc}") from exc
 
 
 def list_due(date: str, db_path: Optional[str] = None) -> dict:
@@ -427,71 +434,80 @@ def handle_request(action: str, params: dict, emit: EventEmitter | None = None, 
     Supported actions: list_due, create_task, update_task, delete_task, complete_occurrence,
                        get_task_history, list_users, sync_users_from_ha, create_user.
     """
-    if action == "list_due":
-        date = params.get("date")
-        payload = list_due(date, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+    logger.info(
+        "dispatching todo request",
+        extra={"action": action, "calling_user_id": calling_user_id, "params": params},
+    )
 
-    if action == "create_task":
-        task = params.get("task") or {}
-        payload = create_task(task, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+    try:
+        if action == "list_due":
+            date = params.get("date")
+            payload = list_due(date, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    if action == "update_task":
-        task_id = params.get("task_id")
-        fields = params.get("fields") or {}
-        payload = update_task(task_id, fields, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+        if action == "create_task":
+            task = params.get("task") or {}
+            payload = create_task(task, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    if action == "delete_task":
-        task_id = params.get("task_id")
-        payload = delete_task(task_id, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+        if action == "update_task":
+            task_id = params.get("task_id")
+            fields = params.get("fields") or {}
+            payload = update_task(task_id, fields, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    if action == "complete_occurrence":
-        task_id = params.get("task_id")
-        due_date = params.get("due_date")
-        payload = complete_occurrence(task_id, due_date, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+        if action == "delete_task":
+            task_id = params.get("task_id")
+            payload = delete_task(task_id, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    if action == "get_task_history":
-        task_id = params.get("task_id")
-        limit = int(params.get("limit", 50))
-        offset = int(params.get("offset", 0))
-        payload = get_task_history(task_id, limit, offset, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+        if action == "complete_occurrence":
+            task_id = params.get("task_id")
+            due_date = params.get("due_date")
+            payload = complete_occurrence(task_id, due_date, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    if action == "list_users":
-        payload = list_users(params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+        if action == "get_task_history":
+            task_id = params.get("task_id")
+            limit = int(params.get("limit", 50))
+            offset = int(params.get("offset", 0))
+            payload = get_task_history(task_id, limit, offset, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    if action == "sync_users_from_ha":
-        ha_users = params.get("ha_users", [])
-        payload = sync_users_from_ha(ha_users, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+        if action == "list_users":
+            payload = list_users(params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    if action == "create_user":
-        ha_user_id = params.get("ha_user_id")
-        username = params.get("username")
-        payload = create_user(ha_user_id, username, params.get("db_path"))
-        if emit:
-            emit("todo_response", payload)
-        return payload
+        if action == "sync_users_from_ha":
+            ha_users = params.get("ha_users", [])
+            payload = sync_users_from_ha(ha_users, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
 
-    raise ValueError(f"Unknown action: {action}")
+        if action == "create_user":
+            ha_user_id = params.get("ha_user_id")
+            username = params.get("username")
+            payload = create_user(ha_user_id, username, params.get("db_path"))
+            if emit:
+                emit("todo_response", payload)
+            return payload
+
+        raise ValueError(f"Unknown action: {action}")
+    except Exception as exc:
+        logger.exception("todo request failed", extra={"action": action, "params": params})
+        raise RuntimeError(f"todo request failed for {action}: {exc}") from exc

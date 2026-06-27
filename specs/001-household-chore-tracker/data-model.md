@@ -112,6 +112,9 @@ INSERT OR IGNORE INTO meta(key, value) VALUES('schema_version', '1');
 -- PRAGMA recommendations for reliability and concurrency
 PRAGMA journal_mode = WAL;
 PRAGMA synchronous = NORMAL;
+PRAGMA temp_store = MEMORY;
+PRAGMA cache_size = -2000;
+PRAGMA wal_autocheckpoint = 1000;
 
 -- Date handling note
 -- Store calendar dates in `YYYY-MM-DD` format in the household local timezone. For single-date tasks set `start_due_date` and leave `end_due_date` NULL; interval tasks set both `start_due_date` and `end_due_date` (inclusive).

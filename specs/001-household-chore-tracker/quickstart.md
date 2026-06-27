@@ -1,10 +1,11 @@
 ## Quickstart (developer notes)
 
-- Home Assistant: copy built frontend to `/config/www/todo-system/` and pyscripts to `/config/pyscripts/` for local testing.
-- Pyscript DB path: default is `ha/data/todo.sqlite`. Override with `TODO_DB_PATH` env var during dev.
+- Home Assistant: copy the built frontend to `/config/www/todo-system/` and the Pyscript modules to `/config/pyscripts/` for local testing.
+- Pyscript DB path: default is `/config/todo_system/todo.db` for production-style deployments. Override with the backend config if needed during dev.
 - Recommended PRAGMAs: WAL journal, `synchronous=NORMAL`, `foreign_keys=ON`.
 - For local dev, run `python3 -m ha.pyscripts.todo_db` to apply migrations.
-# quickstart.md
+
+# Quickstart
 
 This quickstart describes the minimal steps to validate the feature end-to-end in Home Assistant OS (HAOS). It assumes you have access to the HA UI (HACS installed or installable) and permission to copy files into the HA `config` directory (Samba/SSH add-on or similar).
 
@@ -83,6 +84,14 @@ panel_custom:
       html_url: /local/todo-system/index.html
 ```
 
+4. If you prefer a one-shot deployment, run the helper script from the repository root:
+
+```bash
+./scripts/deploy_to_ha.sh
+```
+
+> In practice, the script expects the Home Assistant target path to be available via the `HA_CONFIG_DIR` environment variable or the default `/config` mount.
+
 4. Restart Home Assistant and open the new sidebar entry "Chore Tracker".
 
 ## Validate (end-to-end)
@@ -92,6 +101,16 @@ panel_custom:
 3. Use the UI to create a recurring task and confirm it appears in "Due Today" when appropriate.
 
 ## Quick verification: Recurrence format
+
+- Confirm the database file exists and has restricted permissions:
+
+```bash
+ls -l /config/todo_system/todo.db
+chmod 600 /config/todo_system/todo.db
+```
+
+- For production deployments, ensure the underlying storage is encrypted and the backup process preserves that protection.
+
 
 - When creating tasks via the UI or direct service calls, the `recurrence_rule` payload MUST be a JSON object in the canonical format (see `data-model.md`). Example service payload for creating a weekly task on Mondays:
 

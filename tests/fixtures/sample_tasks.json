@@ -1,0 +1,15 @@
+[
+  {
+    "title": "Take out trash",
+    "description": "Weekly chore",
+    "due_date": "2026-06-27",
+    "assignee_ha_user_id": "user-1"
+  },
+  {
+    "title": "Water plants",
+    "description": "Every Monday",
+    "start_due_date": "2026-06-22",
+    "end_due_date": "2026-06-28",
+    "recurrence_rule": {"freq": "weekly", "byweekday": [1]}
+  }
+]

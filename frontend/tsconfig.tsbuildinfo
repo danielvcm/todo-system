@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/duelist.test.tsx","./src/components/duelist.tsx","./src/components/occurrencerow.test.tsx","./src/components/occurrencerow.tsx","./src/i18n/en.ts","./src/pages/createtask.test.tsx","./src/pages/createtask.tsx","./src/pages/duetoday.tsx","./src/services/haconnector.ts","./src/test/setup.ts"],"version":"5.9.3"}

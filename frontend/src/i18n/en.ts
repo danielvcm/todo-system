@@ -1,0 +1,20 @@
+export const messages = {
+  dueTodayTitle: 'Due today',
+  loading: 'Loading chores…',
+  empty: 'Nothing due today.',
+  error: 'We could not load your chores right now.',
+  markComplete: 'Mark complete',
+  assignee: 'Assignee',
+  recurrence: 'Recurring',
+  createTask: 'Create task',
+  titleLabel: 'Title',
+  descriptionLabel: 'Description',
+  assigneeLabel: 'Assignee',
+  dueDateLabel: 'Due date',
+  startDateLabel: 'Start date',
+  endDateLabel: 'End date',
+  recurrenceLabel: 'Recurrence',
+  submit: 'Save task',
+  requiredTitle: 'Title is required',
+  invalidInterval: 'End date must be on or after the start date.'
+};
